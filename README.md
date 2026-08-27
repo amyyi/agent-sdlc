@@ -1,6 +1,6 @@
 # agent-sdlc
 
-A complete software delivery pipeline for coding agents, expressed as ten skills.
+A software delivery pipeline for coding agents, expressed as seven skills.
 
 Not a toolbox — a **process**. Each skill's output is the next one's input, from "there is no design file" through to "here is the MR description, with screenshot evidence for every error path."
 
@@ -33,7 +33,7 @@ ux-draft ──────────► no design file? interview → state m
        │                                          ↓ user picks by looking
 blind-spot-pass ───► unfamiliar module? surface the unknown unknowns first
        │
-grilling ──────────► interview until the design tree has no unvisited branches
+   ( grilling )      interview until the design tree has no unvisited branches   ← third-party
        │
     [ plan ]         decision-bearing tasks first, mechanical refactors last
        │
@@ -49,11 +49,14 @@ merge-readiness ───► HTML report + quiz + paste-ready MR description
        │
     [ MR ]           ← the human presses this button
        │
-handoff ───────────► cross-session / cross-agent continuity
+   ( handoff )       cross-session / cross-agent continuity                      ← third-party
 ```
 
 `visual-review` runs after `browser-verify` when the change needs design polish.
 `hotfix-propagate` is a parallel track for fixes that must land on several release branches.
+
+Stages in `( parentheses )` are third-party skills this pipeline composes with — see [Composes with](#composes-with).
+Stages in `[ brackets ]` are ordinary agent work, shaped by the conventions below rather than by a skill.
 
 ---
 
@@ -64,7 +67,7 @@ The entire required-action list, for one feature:
 | When | You do |
 |---|---|
 | UI with no design file | Answer a short UX interview (≤2 rounds), pick a direction on the canvas |
-| Design questions | Answer the grilling rounds — each question comes with a recommended answer, so "agree with Q1-Q3, change Q4 to X" is a complete reply |
+| Design questions | Answer the interview rounds — each question comes with a recommended answer, so "agree with Q1-Q3, change Q4 to X" is a complete reply |
 | Localized UI | Keep the translation export fresh; confirm copy for new keys |
 | Before commit | Read the merge-readiness report; answer 3-5 quiz questions on high-risk changes |
 | Opening the MR | Run the prepared command |
@@ -81,32 +84,38 @@ Seven items. That is the design target, not an accident.
 |---|---|
 | [`ux-draft`](skills/ux-draft) | No-Figma design pipeline: UX interview → state matrix → 2-4 direction mockups embodying real trade-offs |
 | [`blind-spot-pass`](skills/blind-spot-pass) | Surface unknown unknowns before entering unfamiliar code — hidden couplings, unwritten conventions, landmines |
-| [`grilling`](skills/grilling) | Interview the user as a design tree, worked in rounds; architecture-changing questions first, each with a recommended answer |
-| [`grill-me`](skills/grill-me) | Manual entry point for `grilling` |
 | [`browser-verify`](skills/browser-verify) | Playwright walkthrough with asserted steps and screenshot evidence; error tracks mandatory; console errors fail the run |
 | [`i18n-check`](skills/i18n-check) | Verify every translation key in the diff exists in the export; resolve dynamic call sites; draft copy for missing keys |
 | [`merge-readiness`](skills/merge-readiness) | HTML report (context, decisions, changes grouped by concern, deviations, debugging intuition) + comprehension quiz + paste-ready MR description |
 | [`visual-review`](skills/visual-review) | Designer's-eye QA against a written criteria source — consistency, hierarchy, AI-slop patterns, state completeness |
 | [`hotfix-propagate`](skills/hotfix-propagate) | One fix, several release branches, zero forgotten targets — checklist-driven cherry-pick with per-target tests |
-| [`handoff`](skills/handoff) | Agent-neutral handoff documents so any coding agent can pick up where another stopped |
+
+---
+
+## Composes with
+
+Two stages of this pipeline are already covered well by existing skills, so I did not rebuild them. Install them alongside these:
+
+- **[`grilling` / `grill-me`](https://github.com/mattpocock/skills)** (Matt Pocock, MIT) — the interview stage. Maps a plan as a design tree and works it in rounds: ask the whole settled frontier at once, order questions by blast radius, supply a recommended answer for each, and treat finding *facts* as the agent's job while *decisions* stay the user's. `ux-draft`'s micro-interview and `blind-spot-pass`'s "decision needed?" output are both written to feed this.
+- **[`handoff`](https://github.com/mattpocock/skills)** (Matt Pocock, MIT) — cross-session continuity. Compacts a conversation into a document another agent can pick up, referencing existing artifacts by path instead of duplicating them.
+
+Install with `npx skills@latest add mattpocock/skills`, or through his Claude Code plugin.
 
 ---
 
 ## Design principles
 
-These recur across every skill, and are the actually transferable part.
+These recur across the skills here, and are the actually transferable part.
 
 **Evidence over assertion.** "Ready" is a claim that requires artifacts. Screenshots with assertions, a replayable script, a report on disk. `browser-verify` fails a run on a console error even when every screenshot looks correct.
 
 **The error track is the point.** Happy-path verification is theater. Wire-layer failures — HTTP 200 carrying a validation error in the body — are invisible unless you deliberately walk them. Every mocked error scenario the change touches gets a step.
 
-**Questions in rounds, ordered by blast radius.** Interviews are a frontier over a design tree, not a queue. Ask everything currently answerable at once; ask architecture-changing questions before cosmetic ones; supply a recommended answer for each so agreeing is cheap.
-
-**Facts are the agent's job, decisions are the user's.** Never ask a human for something that can be looked up. Never decide something on their behalf that changes the architecture.
-
 **Checklists with no optional rows.** `hotfix-propagate` is not done when the urgent MR is up — it is done when every target branch has one. Partial completion is the failure mode being defended against.
 
 **Criteria over taste.** `visual-review` cites a written standard for every fix. Anything beyond the standard is a suggestion, not a silent change.
+
+**Find the unknowns before planning, not during.** Constraints discovered after the plan is written force rework, so `blind-spot-pass` is a gate rather than a lookup.
 
 **Deviate, record, continue.** When the plan does not survive contact with the code: write down what deviated and which conservative option was taken, then keep going. Never silently redesign, never block waiting.
 
@@ -143,4 +152,4 @@ Two shared conventions the skills expect:
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE). The third-party skills named under [Composes with](#composes-with) are not included in this repository; install them from their own source.

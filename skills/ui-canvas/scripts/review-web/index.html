@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UI Canvas · 畫面審閱</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body>
+  <header class="topbar"><div><span class="eyebrow">UI CANVAS</span><h1>畫面審閱</h1></div><div class="version" id="version">連線中</div><span id="source-revision" class="muted"></span><div id="connection" role="status" class="connection">正在讀取審閱資料…</div></header>
+  <nav id="flow" class="flow" aria-label="畫面流程"></nav>
+  <main class="workspace">
+    <section class="canvas-pane" aria-label="畫布">
+      <div id="canvas-tools" class="canvas-tools">
+        <button id="zoom-out" type="button" aria-label="縮小">－</button>
+        <button id="zoom-in" type="button" aria-label="放大">＋</button>
+        <button id="zoom-fit" type="button">全部顯示</button>
+        <button id="zoom-100" type="button">100%</button>
+        <button id="select-mode" type="button" aria-pressed="false" disabled>選取區域留言</button>
+        <span id="bridge-status" class="muted">尚未開啟畫面</span>
+        <strong id="screen-title">總覽</strong>
+      </div>
+      <p id="select-hint" class="muted" hidden></p>
+      <div id="viewport" class="viewport" tabindex="0" aria-label="可縮放平移的畫布">
+        <div id="stage" class="stage"></div>
+      </div>
+    </section>
+    <aside class="review-pane" aria-label="審閱留言">
+      <section class="composer">
+        <div class="section-heading"><h2 id="draft-title">新增留言</h2><span id="target" class="anchor-tag">尚未選取區域</span></div>
+        <p id="target-status" class="muted">要留言：先按上方「選取區域留言」，再點畫面上的區塊。</p>
+        <form id="note-form"><label for="reviewer-text">你希望畫面如何調整？</label><textarea id="reviewer-text" rows="4" placeholder="用自己的話描述預期看到的結果…" required></textarea><div class="form-actions"><button id="save-note" type="submit" class="primary" disabled>儲存留言</button><button id="cancel-edit" type="button" hidden>取消編輯</button></div></form>
+        <p id="draft-error" class="error" role="alert" hidden></p><button id="reload-conflict" type="button" hidden>重新讀取最新版本（保留草稿）</button>
+      </section>
+      <section class="notes-section">
+        <div class="section-heading"><h2>討論紀錄</h2><span id="note-count" class="muted">0 則</span></div>
+        <div id="filter" class="filter" aria-label="篩選留言"></div>
+        <div id="notes"><p class="empty">選取區域，留下第一則留言。</p></div>
+      </section>
+      <details class="approval"><summary>確認整個版本</summary><p class="muted">此確認涵蓋畫布上所有畫面，獨立於留言處理狀態。請確認目前畫面與未解決事項後再送出。</p><p id="approval-pending" class="muted"></p>
+        <div id="approval-open" hidden>
+          <p id="approval-open-heading" class="approval-open-heading"></p>
+          <ul id="approval-open-list" class="approval-open-list"></ul>
+          <div class="approval-open-actions"><button id="accept-current" type="button">全部照目前畫面定案</button><button id="defer-all" type="button">全部列為未決事項</button></div>
+        </div>
+        <form id="approval-form"><label for="reviewer">確認人</label><input id="reviewer" autocomplete="name" required><label for="confirmation">確認文字</label><textarea id="confirmation" rows="2" placeholder="這版可以，作為實作參考" required></textarea><label for="gaps">接受的未決事項（每行一項）</label><textarea id="gaps" rows="3" placeholder="例如：重試規則待 PM 決定"></textarea><label class="check"><input type="checkbox" id="no-gaps"> 沒有需要保留的未決事項</label><p id="no-gaps-hint" class="muted" hidden></p><p id="gaps-hint" class="error" role="alert" hidden></p><button class="primary" type="submit" id="approve">確認目前畫面版本</button></form><p id="approval-result" role="status"></p><div id="approvals"></div></details>
+    </aside>
+  </main>
+</body></html>
